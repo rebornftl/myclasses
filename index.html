@@ -1138,6 +1138,7 @@
     </main>
   </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ============ КОНФИГУРАЦИЯ ============
 const ADMIN_LOGIN = "AdminLS";
@@ -1150,6 +1151,54 @@ const STORAGE_KEYS = {
   PROFILES: "tu_profiles",
   REMOTE: "tu_remote"
 };
+
+// Supabase settings (подставьте свои значения)
+const SUPABASE_URL = "https://YOUR_PROJECT_REF.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
+const supabase = SUPABASE_URL && SUPABASE_ANON_KEY ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+function isSupabaseEnabled() {
+  return !!supabase;
+}
+
+async function loadSupabaseTimetables() {
+  if (!isSupabaseEnabled()) return;
+
+  const { data, error } = await supabase
+    .from("timetables")
+    .select("key, payload")
+    .order("updated_at", { ascending: false });
+
+  if (error) {
+    console.warn("Supabase load error:", error.message);
+    return;
+  }
+
+  data?.forEach(row => {
+    if (row.key && row.payload) {
+      currentState.timetables[row.key] = row.payload;
+    }
+  });
+}
+
+async function saveSupabaseTimetable(key, payload) {
+  if (!isSupabaseEnabled()) return;
+
+  const { error } = await supabase
+    .from("timetables")
+    .upsert({ key, payload, updated_at: new Date().toISOString() }, { onConflict: "key" });
+
+  if (error) {
+    console.warn("Supabase save error:", error.message);
+  }
+}
+
+async function syncTimetableKey(key) {
+  const timetable = currentState.timetables[key];
+  if (!timetable) return;
+
+  await saveSupabaseTimetable(key, timetable);
+}
 
 // ============ ДАННЫЕ ============
 const WEEKDAYS = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
@@ -1861,11 +1910,26 @@ function saveAdminTimetable() {
   };
   
   localStorage.setItem(STORAGE_KEYS.TIMETABLES, JSON.stringify(currentState.timetables));
-  
-  const status = document.getElementById("adminSaveStatus");
-  status.innerHTML = "✅ <b>Расписание успешно сохранено!</b>";
-  status.style.color = "var(--success)";
-  setTimeout(() => status.innerHTML = "", 4000);
+
+  if (isSupabaseEnabled()) {
+    syncTimetableKey(key).then(() => {
+      const status = document.getElementById("adminSaveStatus");
+      status.innerHTML = "✅ <b>Расписание сохранено в Supabase!</b>";
+      status.style.color = "var(--success)";
+      setTimeout(() => status.innerHTML = "", 4000);
+    }).catch(err => {
+      console.warn("Supabase save error:", err);
+      const status = document.getElementById("adminSaveStatus");
+      status.innerHTML = "⚠️ Локально сохранено, но не удалось отправить в Supabase.";
+      status.style.color = "var(--danger)";
+      setTimeout(() => status.innerHTML = "", 5000);
+    });
+  } else {
+    const status = document.getElementById("adminSaveStatus");
+    status.innerHTML = "✅ <b>Расписание успешно сохранено!</b>";
+    status.style.color = "var(--success)";
+    setTimeout(() => status.innerHTML = "", 4000);
+  }
 }
 
 // ============ ЗАГРУЗКА/СОХРАНЕНИЕ ============
@@ -1904,6 +1968,16 @@ function loadData() {
   // Домашнее обучение
   const remote = localStorage.getItem(STORAGE_KEYS.REMOTE);
   if (remote) currentState.remoteClasses = JSON.parse(remote);
+
+  if (isSupabaseEnabled()) {
+    loadSupabaseTimetables().then(() => {
+      // обновить расписание, если уже выбран класс
+      if (currentState.studentClass) {
+        generateClassOptions();
+        renderTimetable();
+      }
+    }).catch(err => console.warn("Supabase sync error:", err));
+  }
 }
 </script>
 </body>
