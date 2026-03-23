@@ -1,11 +1,16 @@
-// ============ ЗАЩИТА САЙТА ============
-// Отключить контекстное меню (правый клик)
+// ============ ЗАЩИТА САЙТА (ЛЕГКАЯ ВЕРСИЯ) ============
+
+// Отключить контекстное меню (правый клик) - только на non-input элементах
 document.addEventListener('contextmenu', (e) => {
+  // Разрешить правый клик на input элементах
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    return;
+  }
   e.preventDefault();
   return false;
 });
 
-// Отключить DevTools (F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J)
+// Отключить основные горячие клавиши DevTools
 document.addEventListener('keydown', (e) => {
   // F12
   if (e.key === 'F12') {
@@ -27,71 +32,44 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     return false;
   }
-  // Ctrl+Shift+K (Network/Console)
+  // Ctrl+Shift+K (Network)
   if (e.ctrlKey && e.shiftKey && e.key === 'K') {
     e.preventDefault();
     return false;
   }
-});
+}, true);
 
-// Отключить выделение текста
-document.addEventListener('selectstart', (e) => {
-  e.preventDefault();
-  return false;
-});
-
-// Отключить копирование
-document.addEventListener('copy', (e) => {
-  e.preventDefault();
-  return false;
-});
-
-// Проверка открытия DevTools через высоту окна
+// Проверка открытия DevTools через высоту окна (мягче)
+let devtoolsWarned = false;
 setInterval(() => {
-  const threshold = 160;
+  const threshold = 200;
   if (window.outerHeight - window.innerHeight > threshold ||
       window.outerWidth - window.innerWidth > threshold) {
-    // DevTools открыты
-    document.body.style.display = 'none';
+    if (!devtoolsWarned) {
+      devtoolsWarned = true;
+      console.clear();
+      console.log('%c⚠️ DevTools обнаружены!', 'color: red; font-size: 16px; font-weight: bold;');
+      // Можно добавить дополнительные действия
+    }
+  } else {
+    devtoolsWarned = false;
   }
-}, 500);
+}, 1000);
 
-// Блокировка консоли функции для вывода
-const noop = () => {};
-window.console = {
-  log: noop,
-  warn: noop,
-  error: noop,
-  info: noop,
-  debug: noop,
-  time: noop,
-  timeEnd: noop,
-  table: noop,
-  clear: noop,
-  assert: noop,
-  group: noop,
-  groupEnd: noop
+// Перенаправить консоль (но оставить возможность работы)
+const originalLog = console.log;
+const originalError = console.error;
+const originalWarn = console.warn;
+
+console.log = function(...args) {
+  // Логи видны в консоли, но можно отключить если нужно
+  originalLog.apply(console, args);
 };
 
-// Отключить инструменты разработчика через другие методы
-try {
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  document.body.appendChild(iframe);
-  const iframeConsole = iframe.contentWindow.console;
-  
-  Object.defineProperty(window, 'console', {
-    get() {
-      if (iframeConsole.log.toString().includes('native code')) {
-        return iframeConsole;
-      }
-      return {};
-    }
-  });
-} catch (e) {}
+console.error = function(...args) {
+  originalError.apply(console, args);
+};
 
-// Предупреждение при попытке открыть DevTools
-console.log('%c⚠️ ВНИМАНИЕ!', 
-  'color: red; font-size: 20px; font-weight: bold;');
-console.log('%cЭтот сайт защищен. Попытки вмешательства будут зафиксированы.',
-  'color: orange; font-size: 14px;');
+console.warn = function(...args) {
+  originalWarn.apply(console, args);
+};
