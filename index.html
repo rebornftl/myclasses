@@ -21,8 +21,8 @@
     [data-theme="dark"] {
       --bg: #030712;
       --fg: #e5e7eb;
-      --accent: #60a5fa;
-      --accent-soft: #1d283a;
+      --accent: #1e3a8a;
+      --accent-soft: rgba(30,58,138,0.12);
       --card: #020617;
       --border: #1f2933;
       --muted: #9ca3af;
@@ -58,49 +58,66 @@
       padding: 20px;
     }
     .start-logo {
-      width: 100px;
-      height: 100px;
+      width: 112px;
+      height: 112px;
       border-radius: 28px;
-      background: conic-gradient(from 210deg, #111827, #4b5563, #111827);
+      background: linear-gradient(160deg, #1d4ed8, #111827);
+      color: #f4f0e8;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #f9fafb;
-      font-weight: 800;
-      font-size: 42px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 22px 62px rgba(16, 30, 40, 0.24);
       margin-bottom: 32px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: floatSoft 8s ease-in-out infinite;
+    }
+    .start-logo::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 22% 22%, rgba(255,255,255,0.24), transparent 24%);
+      pointer-events: none;
+    }
+    .start-logo svg {
+      width: 72px;
+      height: 72px;
+      color: #f4f0e8;
     }
     .start-title {
-      font-size: 42px;
+      font-size: 44px;
       font-weight: 800;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       text-align: center;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      text-transform: uppercase;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.08);
     }
     .start-subtitle {
       font-size: 18px;
       color: var(--muted);
       margin-bottom: 48px;
       text-align: center;
-      max-width: 400px;
-      line-height: 1.5;
+      max-width: 420px;
+      line-height: 1.6;
     }
     .start-btn {
-      padding: 20px 56px;
-      font-size: 20px;
-      border-radius: 16px;
+      padding: 18px 52px;
+      font-size: 19px;
+      border-radius: 999px;
       border: none;
       background: linear-gradient(135deg, var(--accent), #1d4ed8);
-      color: white;
+      color: #f8fafc;
       cursor: pointer;
       font-weight: 700;
-      box-shadow: 0 12px 40px rgba(37,99,235,0.35);
-      transition: all 0.3s;
+      letter-spacing: 0.02em;
+      box-shadow: 0 12px 34px rgba(37,99,235,0.26);
+      transition: transform 0.28s ease, box-shadow 0.28s ease;
     }
     .start-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 16px 50px rgba(37,99,235,0.45);
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 16px 42px rgba(37,99,235,0.32);
     }
 
     /* Скрытая кнопка админа - в левом нижнем углу, очень незаметная */
@@ -178,16 +195,28 @@
       padding: 0 12px;
     }
     .sidebar-logo {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      background: conic-gradient(from 210deg, #111827, #4b5563, #111827);
-      display: flex;
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: conic-gradient(from 210deg, #111827, #2563eb, #111827);
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       color: #f9fafb;
-      font-weight: 800;
-      font-size: 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 48px rgba(10, 28, 40, 0.14);
+    }
+    .sidebar-logo::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 28%, rgba(255,255,255,0.22), transparent 24%);
+      pointer-events: none;
+    }
+    .sidebar-logo svg {
+      width: 26px;
+      height: 26px;
     }
     .sidebar-brand-text {
       font-size: 24px;
@@ -198,11 +227,11 @@
       align-items: center;
       gap: 14px;
       padding: 14px 18px;
-      border-radius: 14px;
+      border-radius: 16px;
       cursor: pointer;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       color: var(--muted);
-      transition: all 0.2s;
+      transition: all 0.24s ease;
       font-size: 15px;
       font-weight: 500;
     }
@@ -212,6 +241,23 @@
     }
     .nav-item.active {
       font-weight: 600;
+    }
+    .nav-icon,
+    .bottom-nav-icon,
+    .theme-icon,
+    .admin-corner-btn svg {
+      width: 24px;
+      height: 24px;
+      display: block;
+    }
+    .nav-icon svg,
+    .bottom-nav-icon svg,
+    .theme-icon svg,
+    .admin-corner-btn svg {
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
+      fill: none;
     }
     .sidebar-footer {
       margin-top: auto;
@@ -277,20 +323,37 @@
       right: 24px;
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-size: 14px;
       color: var(--muted);
       cursor: pointer;
       user-select: none;
-      padding: 10px 16px;
+      padding: 12px 18px;
       border-radius: 999px;
       border: 1px solid var(--border);
       background: var(--card);
+      backdrop-filter: blur(12px);
       z-index: 50;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 18px 45px rgba(5,15,26,0.16);
+      animation: floatSoft 9s ease-in-out infinite;
+    }
+    .theme-label {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg);
+    }
+    .theme-icon {
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
     }
     .switch {
-      width: 44px;
+      width: 46px;
       height: 24px;
       border-radius: 999px;
       background: var(--border);
@@ -306,7 +369,7 @@
       background: var(--card);
       top: 3px;
       left: 3px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.18);
       transition: transform 0.2s;
     }
     .switch.on {
@@ -314,6 +377,10 @@
     }
     .switch.on::after {
       transform: translateX(20px);
+    }
+    @keyframes floatSoft {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
     }
 
     /* Карточки */
@@ -431,6 +498,35 @@
       opacity: 0.5;
       cursor: not-allowed;
       transform: none !important;
+    }
+    .btn-icon,
+    .inline-icon,
+    .empty-state-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      margin-right: 8px;
+    }
+    .btn-icon,
+    .inline-icon {
+      width: 18px;
+      height: 18px;
+    }
+    .empty-state-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 16px;
+      color: var(--accent);
+    }
+    .btn-icon svg,
+    .inline-icon svg,
+    .empty-state-icon svg,
+    .delete-icon svg {
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
+      fill: none;
     }
 
     /* Расписание */
@@ -870,13 +966,24 @@
 <body data-theme="light">
   <!-- Начальный экран -->
   <div id="startScreen">
-    <div class="start-logo">ТУ</div>
+    <div class="start-logo">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <path d="M20 97.5A12.5 12.5 0 0 1 32.5 85H100" stroke="currentColor" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M32.5 10H100v100H32.5A12.5 12.5 0 0 1 20 97.5v-75A12.5 12.5 0 0 1 32.5 10z" stroke="currentColor" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
     <div class="start-title">Твои Уроки</div>
     <div class="start-subtitle">Удобное расписание для учеников 5–11 классов с интеллектуальным трекером уроков</div>
     <button class="start-btn" onclick="enterAsStudent()">Войти как ученик</button>
     
     <!-- СКРЫТАЯ КНОПКА АДМИНА - в левом нижнем углу, почти невидимая -->
-    <button class="admin-corner-btn" onclick="showAdminLogin()" title="Вход для администратора">⚙</button>
+    <button class="admin-corner-btn" onclick="showAdminLogin()" title="Вход для администратора" aria-label="Вход для администратора">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="1.8" fill="none"/>
+        <circle cx="12" cy="16" r="1" stroke="currentColor" stroke-width="1.8" fill="none"/>
+        <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
     
     <!-- Альтернативный вариант - текстовая ссылка справа внизу -->
     <!-- <div class="admin-text-link" onclick="showAdminLogin()">Для администрации</div> -->
@@ -885,7 +992,7 @@
   <!-- Модальное окно входа админа -->
   <div class="modal-overlay" id="adminLoginModal">
     <div class="modal">
-      <div class="modal-title">🔐 Вход для администратора</div>
+      <div class="modal-title"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Вход для администратора</div>
       <div class="form-group">
         <label>Email</label>
         <input type="text" id="adminLoginInput" placeholder="Введите email администратора" />
@@ -907,20 +1014,50 @@
     <!-- Боковая навигация (ПК) -->
     <nav class="sidebar" id="sidebar">
       <div class="sidebar-brand">
-        <div class="sidebar-logo">ТУ</div>
+        <div class="sidebar-logo">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <path d="M40 35V15m40 20V15m-45 40h50M25 105h70a10 10 0 0010-10V35a10 10 0 00-10-10H25a10 10 0 00-10 10v60a10 10 0 0010 10z" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
         <div class="sidebar-brand-text">Твои Уроки</div>
       </div>
       <div class="nav-item active" onclick="showScreen('schedule')" data-nav="schedule">
-        <span style="font-size: 20px;">📅</span> Расписание
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        Расписание
       </div>
       <div class="nav-item" onclick="showScreen('calculator')" data-nav="calculator" id="calcNavItem" style="display: none;">
-        <span style="font-size: 20px;">🧮</span> Калькулятор
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2" stroke="currentColor" stroke-width="1.8" fill="none"/>
+            <line x1="8" y1="6" x2="16" y2="6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="8" y1="10" x2="16" y2="10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="8" y1="14" x2="16" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="8" y1="18" x2="12" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="16" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </span>
+        Калькулятор
       </div>
       <div class="nav-item" onclick="showScreen('settings')" data-nav="settings" id="settingsNavItem" style="display: none;">
-        <span style="font-size: 20px;">⚙️</span> Настройки
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06-.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001 1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8" fill="none"/>
+          </svg>
+        </span>
+        Настройки
       </div>
       <div class="nav-item" onclick="showScreen('admin')" data-nav="admin" id="adminNavItem" style="display: none;">
-        <span style="font-size: 20px;">🔐</span> Админ-панель
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        Админ-панель
       </div>
       <div class="sidebar-footer">
         FTL Reborn 2026®
@@ -930,26 +1067,49 @@
     <!-- Нижняя навигация (мобильная) -->
     <nav class="bottom-nav" id="bottomNav">
       <div class="bottom-nav-item active" onclick="showScreen('schedule')" data-nav="schedule">
-        <div class="bottom-nav-icon">📅</div>
+        <div class="bottom-nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <span>Расписание</span>
       </div>
       <div class="bottom-nav-item" onclick="showScreen('calculator')" data-nav="calculator" id="calcBottomItem" style="display: none;">
-        <div class="bottom-nav-icon">🧮</div>
+        <div class="bottom-nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2" stroke="currentColor" stroke-width="1.8" fill="none"/>
+            <line x1="8" y1="6" x2="16" y2="6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="8" y1="10" x2="16" y2="10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="8" y1="14" x2="16" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="8" y1="18" x2="12" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="16" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
         <span>Калькулятор</span>
       </div>
       <div class="bottom-nav-item" onclick="showScreen('settings')" data-nav="settings" id="settingsBottomItem" style="display: none;">
-        <div class="bottom-nav-icon">⚙️</div>
+        <div class="bottom-nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06-.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001 1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8" fill="none"/>
+          </svg>
+        </div>
         <span>Настройки</span>
       </div>
       <div class="bottom-nav-item" onclick="showScreen('admin')" data-nav="admin" id="adminBottomItem" style="display: none;">
-        <div class="bottom-nav-icon">🔐</div>
+        <div class="bottom-nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <span>Админ</span>
       </div>
     </nav>
 
     <!-- Переключатель темы -->
-    <div class="theme-toggle" onclick="toggleTheme()">
-      <span id="themeIcon">🌙</span>
+    <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Переключить тему">
+      <span class="theme-icon" id="themeIcon" aria-hidden="true"></span>
+      <span class="theme-label">Тема</span>
       <div class="switch" id="themeSwitch"></div>
     </div>
 
@@ -1005,7 +1165,7 @@
       <!-- Экран расписания -->
       <div class="screen active" id="scheduleScreen">
         <div id="remoteLearningBanner" class="remote-banner hidden">
-          <span style="font-size: 28px;">🏠</span>
+          <span class="inline-icon" aria-hidden="true" style="font-size: 28px; width: 28px; height: 28px; margin-right: 12px;"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           <span>Ваш класс на домашнем обучении</span>
         </div>
 
@@ -1035,17 +1195,25 @@
 
           <div class="timetable-grid" id="timetableGrid">
             <div style="padding: 80px; text-align: center; color: var(--muted); font-size: 16px;">
-              <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
+              <span class="empty-state-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="9" x2="8" y2="9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
               Выберите класс в настройках, чтобы увидеть расписание
             </div>
           </div>
 
-          <div style="margin-top: 28px; display: flex; gap: 16px; flex-wrap: wrap;">
+          <div style="margin-top: 28px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
             <span class="stat-chip">
-              📅 <span id="currentDateDisplay">Сегодня: —</span>
+              <span class="inline-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="4" stroke="currentColor" stroke-width="1.8"/><path d="M7 9.5h10M7 13.5h10M7 17.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </span>
+              <span id="currentDateDisplay">Сегодня: —</span>
             </span>
             <span class="stat-chip">
-              🕐 <span id="currentTimeDisplay">Время: —</span>
+              <span class="inline-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l4 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </span>
+              <span id="currentTimeDisplay">Время: —</span>
             </span>
           </div>
         </div>
@@ -1073,7 +1241,10 @@
           </div>
 
           <button class="primary mt-4" onclick="addGrade()" style="width: 100%;">
-            ➕ Добавить оценку
+            <span class="btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            Добавить оценку
           </button>
 
           <div class="calc-container mt-6">
@@ -1088,7 +1259,12 @@
               <div class="stat-chip">
                 Оценок: <span class="stat-value" id="gradesCount">0</span>
               </div>
-              <button onclick="resetGrades()">🗑 Сбросить</button>
+              <button onclick="resetGrades()">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                Сбросить
+              </button>
             </div>
           </div>
         </div>
@@ -1099,7 +1275,7 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">🔐 Административная панель</div>
+              <div class="card-title"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Административная панель</div>
               <div class="card-subtitle">Управление расписанием, классами и настройками системы</div>
             </div>
             <button onclick="logoutAdmin()" class="danger">Выйти</button>
@@ -1107,7 +1283,7 @@
 
           <!-- Выбор класса для редактирования -->
           <div class="admin-section">
-            <div class="admin-section-title">👥 Выбор класса</div>
+            <div class="admin-section-title"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.8" fill="none"/></svg></span>Выбор класса</div>
             <div class="form-row">
               <div class="form-group">
                 <label>Класс</label>
@@ -1130,14 +1306,15 @@
             <div class="checkbox-group mt-4">
               <input type="checkbox" id="remoteLearningCheck" onchange="toggleRemoteLearning()" />
               <label for="remoteLearningCheck">
-                🏠 Перевести класс на домашнее обучение
+                <span class="inline-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                Перевести класс на домашнее обучение
               </label>
             </div>
           </div>
 
           <!-- Выбор дня -->
           <div class="admin-section">
-            <div class="admin-section-title">📅 Редактирование расписания</div>
+            <div class="admin-section-title"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="4" stroke="currentColor" stroke-width="1.8"/><path d="M7 9.5h10M7 13.5h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>Редактирование расписания</div>
             <div class="schedule-date-row">
               <label for="adminScheduleDateInput" style="margin: 0;">Дата (календарь)</label>
               <input type="date" class="input-date-themed" id="adminScheduleDateInput" onchange="onAdminScheduleDateChange(event)" />
@@ -1157,10 +1334,10 @@
           <!-- Редактор уроков -->
           <div class="admin-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-              <div class="admin-section-title" style="margin: 0;">📚 Уроки</div>
+              <div class="admin-section-title" style="margin: 0;"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="9" x2="8" y2="9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Уроки</div>
               <div style="display: flex; gap: 10px;">
-                <button onclick="addNewLesson()">➕ Добавить урок</button>
-                <button onclick="clearAllLessons()" class="danger">🗑 Очистить всё</button>
+                <button onclick="addNewLesson()"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>Добавить урок</button>
+                <button onclick="clearAllLessons()" class="danger"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 7h12M9 7V5h6v2M8 7v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></span>Очистить всё</button>
               </div>
             </div>
             
@@ -1173,19 +1350,21 @@
 
           <!-- Специальные настройки -->
           <div class="admin-section">
-            <div class="admin-section-title">⚡ Дополнительные настройки</div>
+            <div class="admin-section-title"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 3L5 14h5l-1 7 8-11h-5l1-7z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Дополнительные настройки</div>
             
             <div class="checkbox-group">
               <input type="checkbox" id="bigBreakLessonCheck" onchange="toggleBigBreakLesson()" />
               <label for="bigBreakLessonCheck">
-                📖 Урок на большой перемене (12:25–13:15)
+                <span class="inline-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="9" x2="8" y2="9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                Урок на большой перемене (12:25–13:15)
               </label>
             </div>
 
             <div class="checkbox-group">
               <input type="checkbox" id="ninthLessonCheck" onchange="toggleNinthLesson()" />
               <label for="ninthLessonCheck">
-                9️⃣ Девятый урок
+                <span class="inline-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M10 8h4v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+                Девятый урок
               </label>
             </div>
 
@@ -1211,20 +1390,21 @@
 
           <!-- Управление профилями -->
           <div class="admin-section">
-            <div class="admin-section-title">🏷️ Управление профилями обучения</div>
+            <div class="admin-section-title"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12l7 7 9-9-7-7-9 9z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M10 7h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>Управление профилями обучения</div>
             <div class="form-row">
               <div class="form-group">
                 <input type="text" id="newProfileName" placeholder="Название нового профиля (например: Технологический)" />
               </div>
               <div class="form-group">
-                <button onclick="addProfile()" class="primary" style="width: 100%;">➕ Добавить профиль</button>
+                <button onclick="addProfile()" class="primary" style="width: 100%;"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>Добавить профиль</button>
               </div>
             </div>
             <div id="profilesList" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px;"></div>
           </div>
 
           <button class="primary mt-6" onclick="saveAdminTimetable()" style="width: 100%; padding: 18px; font-size: 17px;">
-            💾 Сохранить расписание
+            <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 7h12M9 7V5h6v2M6 7v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M8 11h8M8 15h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+            Сохранить расписание
           </button>
           <p id="adminSaveStatus" style="text-align: center; margin-top: 16px; font-size: 15px; min-height: 24px;"></p>
         </div>
@@ -1393,11 +1573,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ============ ТЕМА ============
+const THEME_ICONS = {
+  light: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  dark: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+
+function updateThemeIcon(theme) {
+  document.getElementById("themeIcon").innerHTML = THEME_ICONS[theme] || THEME_ICONS.light;
+}
+
 function loadTheme() {
   const theme = localStorage.getItem(STORAGE_KEYS.THEME) || "light";
   document.body.dataset.theme = theme;
   document.getElementById("themeSwitch").classList.toggle("on", theme === "dark");
-  document.getElementById("themeIcon").textContent = theme === "dark" ? "☀️" : "🌙";
+  updateThemeIcon(theme);
 }
 
 function toggleTheme() {
@@ -1406,7 +1595,7 @@ function toggleTheme() {
   document.body.dataset.theme = next;
   localStorage.setItem(STORAGE_KEYS.THEME, next);
   document.getElementById("themeSwitch").classList.toggle("on", next === "dark");
-  document.getElementById("themeIcon").textContent = next === "dark" ? "☀️" : "🌙";
+  updateThemeIcon(next);
 }
 
 // ============ НАВИГАЦИЯ ============
@@ -1608,7 +1797,9 @@ function renderTimetable() {
   if (!currentState.studentClass) {
     document.getElementById("timetableGrid").innerHTML = `
       <div style="padding: 80px; text-align: center; color: var(--muted); font-size: 16px;">
-        <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
+        <span class="empty-state-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="9" x2="8" y2="9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
         Выберите класс в настройках, чтобы увидеть расписание
       </div>
     `;
@@ -1633,7 +1824,9 @@ function renderTimetable() {
     document.getElementById("scheduleSubtitle").textContent = formatLongRussianDate(viewDate);
     document.getElementById("timetableGrid").innerHTML = `
       <div style="padding: 80px; text-align: center; color: var(--muted); font-size: 16px;">
-        <div style="font-size: 48px; margin-bottom: 16px;">☀️</div>
+        <span class="empty-state-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5.5" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3M4.7 4.7l2 2M17.3 17.3l2 2M4.7 19.3l2-2M17.3 6.7l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </span>
         В этот день занятий нет
       </div>
     `;
@@ -1828,7 +2021,9 @@ function renderGrades() {
             <div style="font-size: 14px; color: var(--muted);">Вес: ${g.weight}</div>
           </div>
         </div>
-        <button onclick="removeGrade(${i})" class="delete-lesson-btn">×</button>
+        <button onclick="removeGrade(${i})" class="delete-lesson-btn">
+          <span class="delete-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+        </button>
       </div>
     `).join("");
   }
@@ -2093,7 +2288,9 @@ function renderAdminLessons() {
       </select>
       <input type="text" class="lesson-start-input" placeholder="08:00" value="${escapeAttr(lesson.time?.start || "")}" />
       <input type="text" class="lesson-end-input" placeholder="08:45" value="${escapeAttr(lesson.time?.end || "")}" />
-      <button type="button" class="delete-lesson-btn" onclick="removeAdminLesson(this)">×</button>
+      <button type="button" class="delete-lesson-btn" onclick="removeAdminLesson(this)">
+        <span class="delete-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+      </button>
     </div>
   `).join("");
   
@@ -2124,7 +2321,9 @@ function addNewLesson() {
     </select>
     <input type="text" class="lesson-start-input" placeholder="15:30" value="15:30" />
     <input type="text" class="lesson-end-input" placeholder="16:10" value="16:10" />
-    <button type="button" class="delete-lesson-btn" onclick="removeAdminLesson(this)">×</button>
+    <button type="button" class="delete-lesson-btn" onclick="removeAdminLesson(this)">
+      <span class="delete-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 7h12M9 7V5h6v2M8 7v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></span>
+    </button>
   `;
   container.appendChild(newRow);
 }
@@ -2140,7 +2339,7 @@ function removeAdminLesson(btn) {
 }
 
 function clearAllLessons() {
-  if (confirm("🗑 Удалить все уроки для этого дня?")) {
+  if (confirm("Удалить все уроки для этого дня?")) {
     document.getElementById("adminLessonsEditor").innerHTML = "";
   }
 }
@@ -2172,7 +2371,9 @@ function renderProfilesList() {
   container.innerHTML = currentState.profiles.map((p, i) => `
     <span style="background: var(--accent-soft); color: var(--accent); padding: 10px 18px; border-radius: 999px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border);">
       ${p}
-      <button onclick="removeProfile(${i})" style="background: none; border: none; color: var(--accent); cursor: pointer; padding: 0; font-size: 20px; line-height: 1; opacity: 0.6;">×</button>
+      <button onclick="removeProfile(${i})" style="background: none; border: none; color: var(--accent); cursor: pointer; padding: 0; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; opacity: 0.6;">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
     </span>
   `).join("");
 }
