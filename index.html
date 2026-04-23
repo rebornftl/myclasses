@@ -4,8 +4,11 @@
   <meta charset="UTF-8" />
   <title>Твои Уроки</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0"></script>
+  <!-- Разогреваем TCP+TLS к Supabase заранее, параллельно с парсингом HTML -->
+  <link rel="preconnect" href="https://vcdwobqhbbxodjjmwyex.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="https://vcdwobqhbbxodjjmwyex.supabase.co">
+  <!-- Supabase SDK — self-hosted, чтобы не зависеть от jsdelivr/Fastly -->
+  <script src="vendor/supabase.min.js" defer></script>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body data-theme="light">
