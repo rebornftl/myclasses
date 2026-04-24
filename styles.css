@@ -613,6 +613,30 @@
       pointer-events: none;
     }
 
+    /* Видео-обои — отдельный <video id="wallpaperVideo">, фиксированный фон */
+    #wallpaperVideo {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      pointer-events: none;
+      background: #000;
+    }
+    /* Если включены видео-обои, картиночный ::before-слой должен быть скрыт,
+       иначе он может перекрыть видео (при одновременно активных классах
+       has-wallpaper + has-video-wallpaper из-за гонок миграции/очистки). */
+    body.has-video-wallpaper::before { display: none !important; }
+    /* Превью видео внутри settings — использует тот же размер, что и preview картинки */
+    .theme-setting-preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: inherit;
+      display: block;
+    }
+
     /* Селектор темы в настройках */
     .theme-picker {
       display: grid;
