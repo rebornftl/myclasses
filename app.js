@@ -1444,6 +1444,44 @@ document.addEventListener("click", (e) => {
   if (e.target === modal) closeAdminLogin();
 });
 
+// ============ RATE-LIMIT НА ВХОД В АДМИНКУ ============
+// Клиентский заградитель против брутфорса скрипт-кидди: N неудачных попыток →
+// пауза на LOCKOUT_MS. Это НЕ замена серверному rate limit'у Supabase Auth
+// (Dashboard → Authentication → Rate Limits) — тот обязателен, т.к. клиентский
+// счётчик можно обойти очисткой localStorage. Но от случайного подбора спасает.
+const LOGIN_RATE = {
+  MAX_ATTEMPTS: 5,          // сколько неудачных попыток разрешено
+  LOCKOUT_MS: 5 * 60 * 1000, // длительность блокировки: 5 минут
+  LS_KEY: "tu_login_attempts"
+};
+
+function getLoginAttempts() {
+  const parsed = safeJSONParse(safeGetLS(LOGIN_RATE.LS_KEY), null);
+  if (!parsed || typeof parsed !== "object") return { count: 0, lockedUntil: 0 };
+  return {
+    count: Number(parsed.count) || 0,
+    lockedUntil: Number(parsed.lockedUntil) || 0
+  };
+}
+
+function getLoginLockRemaining() {
+  return Math.max(0, getLoginAttempts().lockedUntil - Date.now());
+}
+
+function recordLoginFailure() {
+  const a = getLoginAttempts();
+  a.count += 1;
+  if (a.count >= LOGIN_RATE.MAX_ATTEMPTS) {
+    a.lockedUntil = Date.now() + LOGIN_RATE.LOCKOUT_MS;
+    a.count = 0; // после блокировки счётчик начинает заново
+  }
+  safeSetLS(LOGIN_RATE.LS_KEY, JSON.stringify(a));
+}
+
+function resetLoginAttempts() {
+  try { localStorage.removeItem(LOGIN_RATE.LS_KEY); } catch (e) { debug(e); }
+}
+
 let _loginInFlight = false;
 async function loginAdmin() {
   if (_loginInFlight) return;
@@ -1451,6 +1489,14 @@ async function loginAdmin() {
   const password = document.getElementById("adminPasswordInput").value;
   const errEl = document.getElementById("adminLoginError");
   const btn = document.getElementById("adminLoginSubmitBtn");
+
+  // Проверка блокировки ДО отправки запроса — не грузим Supabase лишними попытками.
+  const lockMs = getLoginLockRemaining();
+  if (lockMs > 0) {
+    const mins = Math.ceil(lockMs / 60000);
+    errEl.textContent = `⏳ Слишком много попыток. Повторите через ${mins} мин.`;
+    return;
+  }
 
   if (!email || !password) {
     errEl.textContent = "Введите email и пароль";
@@ -1463,10 +1509,18 @@ async function loginAdmin() {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error || !data.session) {
-      errEl.textContent = "❌ Неверный email или пароль";
+      recordLoginFailure();
+      const remaining = LOGIN_RATE.MAX_ATTEMPTS - getLoginAttempts().count;
+      const lockMs2 = getLoginLockRemaining();
+      if (lockMs2 > 0) {
+        errEl.textContent = `⏳ Слишком много попыток. Вход заблокирован на ${Math.ceil(lockMs2 / 60000)} мин.`;
+      } else {
+        errEl.textContent = `❌ Неверный email или пароль (осталось попыток: ${Math.max(1, remaining)})`;
+      }
       return;
     }
 
+    resetLoginAttempts();
     state.admin.authenticated = true;
     closeAdminLogin();
     document.getElementById("startScreen").style.display = "none";
