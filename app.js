@@ -1507,9 +1507,16 @@ async function loginAdmin() {
   if (btn) { btn.disabled = true; btn.dataset.prevText = btn.textContent; btn.textContent = "Входим…"; }
   try {
     if (!supabase) {
-      errEl.textContent = "❌ Не загрузился модуль связи с сервером. Обновите страницу.";
+      errEl.textContent = "❌ Не загрузился модуль связи с сервером (заблокирован блокировщиком?). Обновите страницу.";
       return;
     }
+    // Если в localStorage застряла битая/протухшая сессия, SDK может падать
+    // ещё до отправки логина (при попытке обновить токен). Чистим её —
+    // на успешный вход это не влияет, сессия всё равно заменится новой.
+    try {
+      const sk = Object.keys(localStorage).find(k => /^sb-.*-auth-token$/.test(k));
+      if (sk) localStorage.removeItem(sk);
+    } catch (e) { debug(e); }
     // Таймаут 15 с: без него на «плохом» LTE запрос висит минутами,
     // а пользователь не понимает, жив вход или нет.
     const { data, error } = await withTimeout(
@@ -1541,10 +1548,13 @@ async function loginAdmin() {
     // В консоль — всегда (не только в debug-режиме): это единственный способ
     // понять на устройстве пользователя, почему вход не прошёл.
     console.error("Supabase login error:", err);
-    const msg = String(err && err.message || "");
-    errEl.textContent = /timeout/i.test(msg)
-      ? "⏳ Сервер не ответил за 15 сек. Проверьте интернет (на LTE бывают обрывы) и попробуйте ещё раз."
-      : "❌ Нет соединения с сервером входа. Проверьте интернет или откройте сайт с компьютера.";
+    const raw = String(err && (err.message || err) || "unknown");
+    // Показываем первые ~120 символов реальной ошибки прямо в форме —
+    // так пользователь может прислать скриншот, и причина будет видна сразу.
+    const short = raw.length > 120 ? raw.slice(0, 120) + "…" : raw;
+    errEl.textContent = /timeout/i.test(raw)
+      ? "⏳ Сервер не ответил за 15 сек. Проверьте интернет и попробуйте ещё раз."
+      : `❌ Вход не удался: ${short}`;
   } finally {
     _loginInFlight = false;
     if (btn) { btn.disabled = false; if (btn.dataset.prevText) { btn.textContent = btn.dataset.prevText; delete btn.dataset.prevText; } }
