@@ -1506,7 +1506,17 @@ async function loginAdmin() {
   _loginInFlight = true;
   if (btn) { btn.disabled = true; btn.dataset.prevText = btn.textContent; btn.textContent = "Входим…"; }
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (!supabase) {
+      errEl.textContent = "❌ Не загрузился модуль связи с сервером. Обновите страницу.";
+      return;
+    }
+    // Таймаут 15 с: без него на «плохом» LTE запрос висит минутами,
+    // а пользователь не понимает, жив вход или нет.
+    const { data, error } = await withTimeout(
+      supabase.auth.signInWithPassword({ email, password }),
+      15000,
+      "login"
+    );
 
     if (error || !data.session) {
       recordLoginFailure();
@@ -1528,8 +1538,13 @@ async function loginAdmin() {
     showAdminNav();
     showScreen("admin");
   } catch (err) {
-    errEl.textContent = "❌ Ошибка входа. Попробуйте позже.";
-    debug("Supabase login error:", err);
+    // В консоль — всегда (не только в debug-режиме): это единственный способ
+    // понять на устройстве пользователя, почему вход не прошёл.
+    console.error("Supabase login error:", err);
+    const msg = String(err && err.message || "");
+    errEl.textContent = /timeout/i.test(msg)
+      ? "⏳ Сервер не ответил за 15 сек. Проверьте интернет (на LTE бывают обрывы) и попробуйте ещё раз."
+      : "❌ Нет соединения с сервером входа. Проверьте интернет или откройте сайт с компьютера.";
   } finally {
     _loginInFlight = false;
     if (btn) { btn.disabled = false; if (btn.dataset.prevText) { btn.textContent = btn.dataset.prevText; delete btn.dataset.prevText; } }
