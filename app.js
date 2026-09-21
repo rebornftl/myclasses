@@ -35,7 +35,7 @@ const STORAGE_KEYS = {
   REMOTE: "tu_remote",
   SCHEMA_VERSION: "tu_schema_version"
 };
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 
 // Debug-гвард: чтобы не засорять консоль в продакшене.
 const DEBUG = /[?&]debug=1\b/.test(location.search) || localStorage.getItem("tu_debug") === "1";
@@ -65,6 +65,38 @@ function runStorageMigrations() {
     const parsed = safeJSONParse(raw, null);
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
       safeSetLS(STORAGE_KEYS.TIMETABLES, "{}");
+    }
+  }
+  // v2 -> v3: новый учебный год. Все ученики перешли на класс выше:
+  //   5→6, 6→7, 7→8, 8→9, 9А/Б/В→10А/Б/В, 10А/Б→11А/Б, 11→ выпустились.
+  // Профили 10-х теперь привязаны к литере (ТЕХ/ФХ/БХ/СЭ) — подставляем их;
+  // у новых 9-х групп по математике и профилей нет — сбрасываем.
+  if (v < 3) {
+    const s = safeJSONParse(safeGetLS(STORAGE_KEYS.STUDENT), null);
+    if (s && typeof s === "object" && typeof s.class === "string") {
+      const m = s.class.match(/^(\d+)([АБВ])$/i);
+      if (m) {
+        const grade = parseInt(m[1], 10);
+        const letter = m[2].toUpperCase();
+        if (grade >= 11) {
+          // Выпустились — выбор класса сбрасываем, приложение предложит выбрать заново.
+          s.class = null;
+          s.group = "";
+          s.profile = "";
+        } else {
+          const next = String(grade + 1) + letter;
+          s.class = next;
+          // Профиль: для 10-х — по новой привязке к литере; у 9-х профилей нет.
+          const mapped = CLASS_PROFILES[next];
+          s.profile = (getGradeFromClass(next) === 10) ? (mapped?.[0] || "")
+                    : (getGradeFromClass(next) === 9) ? ""
+                    : (s.profile || "");
+          // Группа по математике: сбрасываем, если для нового класса недопустима.
+          const maxG = getMathGroupCountForClass(next);
+          if (s.group && (+s.group > maxG)) s.group = "";
+        }
+        safeSetLS(STORAGE_KEYS.STUDENT, JSON.stringify(s));
+      }
     }
   }
   safeSetLS(STORAGE_KEYS.SCHEMA_VERSION, String(SCHEMA_VERSION));
@@ -940,11 +972,16 @@ function showScreen(screenName) {
 }
 
 // ============ ГЕНЕРАЦИЯ КЛАССОВ ============
+// Структура параллелей (новый учебный год):
+//   5–8 классы:  А, Б
+//   9 классы:    А, Б            (без В; без групп по математике; без профилей)
+//   10 классы:   А, Б, В         (3 группы по математике; профили по литере)
+//   11 классы:   А, Б            (2 группы; профили по литере — из общего списка)
 function generateClassOptions() {
   const classes = [];
   for (let grade = 5; grade <= 11; grade++) {
-    if (grade === 9) {
-      classes.push("9А", "9Б", "9В");
+    if (grade === 10) {
+      classes.push("10А", "10Б", "10В");
     } else {
       classes.push(grade + "А", grade + "Б");
     }
@@ -990,11 +1027,32 @@ function getGradeFromClass(className) {
   return m ? parseInt(m[0], 10) : 0;
 }
 
+// Привязка профилей (направлений) к литере класса.
+// 10А — технический, 10Б — физ-хим и биолого-химический, 10В — соц-экономический.
+// 11А/11Б — профили прежнего набора (класс уже сформирован в прошлом году).
+const CLASS_PROFILES = {
+  "10А": ["ТЕХ"],
+  "10Б": ["ФХ", "БХ"],
+  "10В": ["СЭ"],
+  "11А": DEFAULT_PROFILES,
+  "11Б": DEFAULT_PROFILES
+};
+
+// Профили, доступные конкретному классу. null = профилей у параллели нет.
+function getProfilesForClass(className) {
+  if (!className) return null;
+  const grade = getGradeFromClass(className);
+  if (grade < 10 || grade > 11) return null;
+  return CLASS_PROFILES[className] || state.data.profiles;
+}
+
 function getMathGroupCountForClass(className) {
   if (!className) return 0;
   const grade = getGradeFromClass(className);
   if (grade < 7 || grade > 11) return 0;
-  return grade === 9 ? 3 : 2;
+  if (grade === 9) return 0;  // у 9-х групп по математике больше нет
+  if (grade === 10) return 3; // у 10-х три группы
+  return 2;
 }
 
 // Сборка <option> за один проход: быстрее, чем innerHTML += в цикле
@@ -1007,14 +1065,13 @@ function buildOptionsHtml(items, labelPrefix) {
 
 function onClassChange() {
   const className = document.getElementById("settingsClass").value;
-  const grade = getGradeFromClass(className);
   const mathGroupSelect = document.getElementById("settingsMathGroup");
   const profileSelect = document.getElementById("settingsProfile");
 
   // Группы математики
-  if (grade >= 7 && grade <= 11) {
+  const groups = getMathGroupCountForClass(className);
+  if (groups > 0) {
     mathGroupSelect.disabled = false;
-    const groups = grade === 9 ? 3 : 2;
     const range = Array.from({ length: groups }, (_, i) => i + 1);
     mathGroupSelect.innerHTML = '<option value="">Без группы</option>' + buildOptionsHtml(range, "Группа ");
   } else {
@@ -1022,10 +1079,11 @@ function onClassChange() {
     mathGroupSelect.innerHTML = '<option value="">Без группы</option>';
   }
 
-  // Профили
-  if (grade >= 9 && grade <= 11) {
+  // Профили (у 9-х нет; у 10/11 — по литере класса)
+  const profiles = getProfilesForClass(className);
+  if (profiles && profiles.length) {
     profileSelect.disabled = false;
-    profileSelect.innerHTML = '<option value="">Без профиля</option>' + buildOptionsHtml(state.data.profiles);
+    profileSelect.innerHTML = '<option value="">Без профиля</option>' + buildOptionsHtml(profiles);
   } else {
     profileSelect.disabled = true;
     profileSelect.innerHTML = '<option value="">Без профиля</option>';
@@ -1655,11 +1713,10 @@ function initAdminPanel() {
 
 function onAdminClassChange() {
   const className = document.getElementById("adminClassSelect").value;
-  const grade = className ? getGradeFromClass(className) : 0;
 
   const mathSelect = document.getElementById("adminMathGroupSelect");
-  if (grade >= 7 && grade <= 11) {
-    const groups = grade === 9 ? 3 : 2;
+  const groups = getMathGroupCountForClass(className);
+  if (groups > 0) {
     const range = Array.from({ length: groups }, (_, i) => i + 1);
     mathSelect.innerHTML = '<option value="">Без группы</option>' + buildOptionsHtml(range, "Группа ");
   } else {
@@ -1667,8 +1724,9 @@ function onAdminClassChange() {
   }
 
   const profileSelect = document.getElementById("adminProfileSelect");
-  if (grade >= 9 && grade <= 11) {
-    profileSelect.innerHTML = '<option value="">Без профиля</option>' + buildOptionsHtml(state.data.profiles);
+  const profiles = getProfilesForClass(className);
+  if (profiles && profiles.length) {
+    profileSelect.innerHTML = '<option value="">Без профиля</option>' + buildOptionsHtml(profiles);
   } else {
     profileSelect.innerHTML = '<option value="">Без профиля</option>';
   }
