@@ -600,6 +600,23 @@
       -webkit-backdrop-filter: blur(var(--card-blur)) saturate(var(--card-saturate));
     }
 
+    /* GPU-композиция для элементов с backdrop-filter.
+       Фризы в Firefox возникали потому, что Gecko пересчитывал размытие
+       всей области за элементом при каждом кадре скролла на CPU. Выносим
+       элемент в собственный композитный слой (translateZ + will-change),
+       тогда блюр считается на GPU один раз, а скролл — это просто
+       перемещение готового слоя.
+       ВАЖНО: вешаем только на «конечные» fixed-элементы без fixed-потомков
+       (.sidebar, .bottom-nav, .theme-toggle) — transform/will-change создают
+       containing block, и вложенный position:fixed внутри .card сломался бы. */
+    .sidebar,
+    .bottom-nav,
+    .theme-toggle {
+      transform: translateZ(0);
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+
     /* Свои обои — фон поверх --bg-gradient */
     body.has-wallpaper::before {
       content: "";
