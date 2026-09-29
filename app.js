@@ -1224,8 +1224,15 @@ function renderTimetable() {
   document.getElementById("scheduleSubtitle").textContent = `${WEEKDAYS[dayOfWeek]} • ${title}`;
   
   // Получить расписание
+  // Ищем сначала по точному ключу (класс|группа|профиль|день),
+  // затем — без группы: расписание обычно общее для всех групп класса,
+  // а отдельная группа указывается только там, где кабинеты/предметы отличаются.
   const key = `${state.student.class}|${state.student.group}|${state.student.profile}|${dayOfWeek}`;
-  const timetable = state.data.timetables[key] || { lessons: [] };
+  const timetable =
+    state.data.timetables[key] ||
+    state.data.timetables[`${state.student.class}||${state.student.profile}|${dayOfWeek}`] ||
+    state.data.timetables[`${state.student.class}|||${dayOfWeek}`] ||
+    { lessons: [] };
   
   // Генерация сетки
   let html = `
@@ -2271,8 +2278,4 @@ function loadData() {
   loadDataFromLocalStorage();
 }
 
-// Блокировка F12/ПКМ/Ctrl+U/S/F намеренно удалена:
-// это не даёт никакой защиты (DevTools открываются через меню или CDP,
-// исходники и так раздаются HTTP-сервером), но ломает реальные функции —
-// поиск по странице, сохранение, орфографию в инпутах. Безопасность должна
-// жить на стороне Supabase (RLS-политики на таблицы).
+
