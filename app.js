@@ -33,6 +33,7 @@ const STORAGE_KEYS = {
   TIMETABLES: "tu_timetables",
   PROFILES: "tu_profiles",
   REMOTE: "tu_remote",
+  UI_SCALE: "tu_ui_scale",
   SCHEMA_VERSION: "tu_schema_version"
 };
 const SCHEMA_VERSION = 3;
@@ -321,7 +322,8 @@ const CHANGE_ACTIONS = {
   onAdminScheduleDateChange: (el, e) => onAdminScheduleDateChange(e)
 };
 const INPUT_ACTIONS = {
-  onGlassStrengthInput: (el) => onGlassStrengthInput(el.value)
+  onGlassStrengthInput: (el) => onGlassStrengthInput(el.value),
+  onUiScaleInput: (el) => onUiScaleInput(el.value)
 };
 
 function installEventDelegation() {
@@ -358,6 +360,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   runStorageMigrations();
   installEventDelegation();
   enhanceNavA11y();
+  applyUiScale(getUiScale());
   loadTheme();
 
   // Мгновенный рендер из localStorage — переключатель классов и кэш
@@ -883,6 +886,33 @@ function updateGlassSettingState() {
   if (!el) return;
   const theme = document.body.dataset.theme || "light";
   el.classList.toggle("disabled", !GLASS_THEMES.includes(theme));
+}
+
+// ============ МАСШТАБ ИНТЕРФЕСА ============
+// Ползунок в Настройках: общий размер блоков (длина/ширина).
+// zoom на <html> пересчитывает и initial containing block, поэтому
+// горизонтальной прокрутки не появляется (проверено: scrollWidth == innerWidth).
+const UI_SCALE = { MIN: 85, MAX: 130, DEFAULT: 100 };
+
+function getUiScale() {
+  const v = parseInt(safeGetLS(STORAGE_KEYS.UI_SCALE), 10);
+  if (!Number.isFinite(v)) return UI_SCALE.DEFAULT;
+  return Math.min(UI_SCALE.MAX, Math.max(UI_SCALE.MIN, v));
+}
+
+function applyUiScale(v) {
+  const val = Math.min(UI_SCALE.MAX, Math.max(UI_SCALE.MIN, Number(v) || UI_SCALE.DEFAULT));
+  document.documentElement.style.zoom = String(val / 100);
+  const l = document.getElementById("uiScaleLabel");
+  if (l) l.textContent = val + "%";
+  const s = document.getElementById("uiScale");
+  if (s && Number(s.value) !== val) s.value = String(val);
+}
+
+function onUiScaleInput(v) {
+  const val = Math.min(UI_SCALE.MAX, Math.max(UI_SCALE.MIN, parseInt(v, 10) || UI_SCALE.DEFAULT));
+  safeSetLS(STORAGE_KEYS.UI_SCALE, String(val));
+  applyUiScale(val);
 }
 
 // Кнопка справа сверху переключает только светлую и тёмную.
@@ -2277,4 +2307,3 @@ function subscribeToSupabaseChanges() {
 function loadData() {
   loadDataFromLocalStorage();
 }
-
